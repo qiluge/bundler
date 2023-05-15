@@ -7,13 +7,10 @@ import fs from 'fs'
 import { HardhatUserConfig } from 'hardhat/config'
 import { NetworkUserConfig } from 'hardhat/src/types/config'
 
-const mnemonicFileName = process.env.MNEMONIC_FILE
-let mnemonic = 'test '.repeat(11) + 'junk'
-if (mnemonicFileName != null && fs.existsSync(mnemonicFileName)) {
-  mnemonic = fs.readFileSync(mnemonicFileName, 'ascii').trim()
-}
+import env from './localconfig/env.json'
+const mnemonic = env.MNEMONIC
 
-const infuraUrl = (name: string): string => `https://${name}.infura.io/v3/${process.env.INFURA_ID}`
+const infuraUrl = (name: string): string => `https://${name}.infura.io/v3/${env.INFURA_ID}`
 
 function getNetwork (url: string): NetworkUserConfig {
   return {
@@ -38,7 +35,9 @@ const config: HardhatUserConfig = {
       url: 'http://localhost:8545/',
       saveDeployments: false
     },
-    goerli: getInfuraNetwork('goerli')
+    goerli: getInfuraNetwork('goerli'),
+    bsctest: getNetwork(`https://bsc.getblock.io/${env.GETBLOCK_ID}/testnet/`),
+    mumbai: getNetwork(`https://matic.getblock.io/${env.GETBLOCK_ID}/testnet/`)
   },
   solidity: {
     version: '0.8.15',
