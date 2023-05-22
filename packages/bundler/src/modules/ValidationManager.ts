@@ -44,7 +44,8 @@ export class ValidationManager {
   constructor (
     readonly entryPoint: EntryPoint,
     readonly reputationManager: ReputationManager,
-    readonly unsafe: boolean) {
+    readonly unsafe: boolean,
+    readonly whitelistContracts?: string[]) {
   }
 
   // standard eth_call to simulateValidation
@@ -182,7 +183,7 @@ export class ValidationManager {
       let tracerResult: BundlerCollectorReturn
       [res, tracerResult] = await this._geth_traceCall_SimulateValidation(userOp)
       let contractAddresses: string[]
-      [contractAddresses, storageMap] = parseScannerResult(userOp, tracerResult, res, this.entryPoint)
+      [contractAddresses, storageMap] = parseScannerResult(userOp, tracerResult, res, this.entryPoint, this.whitelistContracts)
       // if no previous contract hashes, then calculate hashes of contracts
       if (previousCodeHashes == null) {
         codeHashes = await this.getCodeHashes(contractAddresses)

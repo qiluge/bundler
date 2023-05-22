@@ -12,6 +12,8 @@ export interface BundlerConfig {
   unsafe: boolean
   conditionalRpc: boolean
 
+  whitelistContracts?: string[]
+
   whitelist?: string[]
   blacklist?: string[]
   maxBundleGas: number
@@ -32,7 +34,7 @@ export const BundlerConfigShape = {
   port: ow.string,
   unsafe: ow.boolean,
   conditionalRpc: ow.boolean,
-
+  whitelistContracts: ow.optional.array.ofType(ow.string),
   whitelist: ow.optional.array.ofType(ow.string),
   blacklist: ow.optional.array.ofType(ow.string),
   maxBundleGas: ow.number,

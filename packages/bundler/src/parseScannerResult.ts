@@ -11,7 +11,7 @@ import { inspect } from 'util'
 import Debug from 'debug'
 import { toBytes32 } from './modules/moduleUtils'
 import { ValidationResult } from './modules/ValidationManager'
-import { BigNumber, BigNumberish } from 'ethers'
+import { BigNumber, BigNumberish, ethers } from 'ethers'
 import { TestOpcodesAccountFactory__factory, TestOpcodesAccount__factory, TestStorageAccount__factory } from './types'
 import { StakeInfo, StorageMap, UserOperation, ValidationErrors } from './modules/Types'
 
@@ -159,9 +159,10 @@ function parseEntitySlots (stakeInfoEntities: { [addr: string]: StakeInfo | unde
  * @param tracerResults the tracer return value
  * @param validationResult output from simulateValidation
  * @param entryPoint the entryPoint that hosted the "simulatedValidation" traced call.
+ * @param whitelistContracts whitelist contracts
  * @return list of contract addresses referenced by this UserOp
  */
-export function parseScannerResult (userOp: UserOperation, tracerResults: BundlerCollectorReturn, validationResult: ValidationResult, entryPoint: EntryPoint): [string[], StorageMap] {
+export function parseScannerResult (userOp: UserOperation, tracerResults: BundlerCollectorReturn, validationResult: ValidationResult, entryPoint: EntryPoint, whitelistContracts?: string[]): [string[], StorageMap] {
   debug('=== simulation result:', inspect(tracerResults, true, 10, true))
   // todo: block access to no-code addresses (might need update to tracer)
 
@@ -281,6 +282,8 @@ export function parseScannerResult (userOp: UserOperation, tracerResults: Bundle
           requireStakeSlot = slot
         } else if (addr === entityAddr) {
           // accessing storage member of entity itself requires stake.
+          requireStakeSlot = slot
+        } else if ((whitelistContracts?.includes(ethers.utils.getAddress(addr))) === true) {
           requireStakeSlot = slot
         } else {
           // accessing arbitrary storage of another contract is not allowed

@@ -19,7 +19,7 @@ export function initServer (config: BundlerConfig, signer: Signer): [ExecutionMa
   const entryPoint = EntryPoint__factory.connect(config.entryPoint, signer)
   const reputationManager = new ReputationManager(BundlerReputationParams, parseEther(config.minStake), config.minUnstakeDelay)
   const mempoolManager = new MempoolManager(reputationManager)
-  const validationManager = new ValidationManager(entryPoint, reputationManager, config.unsafe)
+  const validationManager = new ValidationManager(entryPoint, reputationManager, config.unsafe, config.whitelistContracts)
   const eventsManager = new EventsManager(entryPoint, mempoolManager, reputationManager)
   const bundleManager = new BundleManager(entryPoint, eventsManager, mempoolManager, validationManager, reputationManager,
     config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, config.conditionalRpc)
